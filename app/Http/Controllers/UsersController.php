@@ -23,6 +23,15 @@ class UsersController extends Controller
     }
 
     /**
+     * 用户列表展示
+     */
+    public function index()
+    {
+        $users = User::paginate(10);
+        return view('users.index', compact('users'));
+    }
+
+    /**
      * 展示注册页面
      */
     public function create()

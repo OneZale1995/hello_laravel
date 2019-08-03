@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Auth;
+use Mail;
 
 class UsersController extends Controller
 {
@@ -14,7 +16,7 @@ class UsersController extends Controller
     {
         $this->middleware('auth', [
             //设定指定动作不使用 Auth 中间件进行过滤
-            'except' => ['show', 'create', 'store']
+            'except' => ['show', 'create', 'store', 'confirmEmail']
         ]);
             //只让未登录用户访问登录页面
         $this->middleware('guest', [
@@ -55,6 +57,37 @@ class UsersController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
+
+        $this->sendEmailConfirmationTo($user);
+
+        session()->flash('success', '验证邮件已发送到你的注册邮箱上，请注意查收。');
+        return redirect('/');
+    }
+
+    /**
+     * 为新注册的用户发送邮件进行验证
+     */
+    public function sendEmailConfirmationTo($user)
+    {
+        $view = "emails.confirm";
+        $data = compact('user');
+        $from = "Weibo@app.com";
+        $name = "Weibo";
+        $to = $user->email;
+        $subject = "感谢注册 Weibo 应用！请确认您的邮箱";
+
+        Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject) {
+            $message->from($from, $name)->to($to)->subject($subject);
+        });
+    }
+
+    public function confirmEmail($token)
+    {
+        $user = User::where('activation_token', $token)->firstOrFail();
+
+        $user->activated = true;
+        $user->activation_token = null;
+        $user->save();
 
         Auth::login($user);
 

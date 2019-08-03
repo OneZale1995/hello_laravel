@@ -19,7 +19,7 @@ class SessionController extends Controller
             'password' => 'required'
         ]);
 
-        if(Auth::attempt($credentials)){
+        if(Auth::attempt($credentials, $request->has('remeber'))) {
             //登录成狗后的相关操作
             session()->flash('success', '欢迎回来!');
             return redirect()->route('users.show', [Auth::user()]);

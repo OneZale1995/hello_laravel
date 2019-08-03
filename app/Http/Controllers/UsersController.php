@@ -105,4 +105,15 @@ class UsersController extends Controller
 
 
     }
+
+    /**
+     * 删除指定用户的操作
+     */
+    public function destroy(User $user)
+    {
+        $this->authorize('destroy', $user);
+        $user->delete();
+        session()->flash('success', '成功删除用户'. $user->name . '！');
+        return back();
+    }
 }

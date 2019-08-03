@@ -8,6 +8,21 @@ use App\Models\User;
 class UsersController extends Controller
 {
     /**
+     * 使用 Laravel 提供身份验证 (Auth) 中间件来过滤未登录用户的edit,update操作
+     */
+    public function __construct()
+    {
+        $this->middleware('auth', [
+            //设定指定动作不使用 Auth 中间件进行过滤
+            'except' => ['show', 'create', 'store']
+        ]);
+            //只让未登录用户访问登录页面
+        $this->middleware('guest', [
+            'only' => ['create']
+        ]);
+    }
+
+    /**
      * 展示注册页面
      */
     public function create()
@@ -55,12 +70,14 @@ class UsersController extends Controller
      */
     public function edit(User $user)
     {
+        $this->authorize('update', $user);
         //compact 为页面渲染二维数组
         return view('users.edit', compact('user'));
     }
 
     public function update(User $user, Request $request)
     {
+        $this->authorize('update', $user);
         $this->validate($request, [
             'name' => 'required|max:50',
             'password' => 'nullable|confirmed|min:6'

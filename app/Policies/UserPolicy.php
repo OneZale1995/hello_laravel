@@ -38,4 +38,5 @@ class UserPolicy
     {
         return $currentUser->id !== $user->id && $currentUser->is_admin;
     }
+
 }

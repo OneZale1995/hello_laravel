@@ -39,6 +39,14 @@ class User extends Authenticatable
     ];
 
     /**
+     * 指明一个用户拥有多条博客
+     */
+    public function statuses()
+    {
+        return $this->hasMany(Status::class);
+    }
+
+    /**
      * 通过用户邮箱访问gravatar获取头像
      */
     public function gravatar($size = '100')

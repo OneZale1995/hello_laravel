@@ -55,11 +55,21 @@ class User extends Authenticatable
         return "http://www.gravatar.com/avatar/$hash?s=$size";
     }
 
+    /**
+     * 监听事件
+     */
     public static function boot() {
         parent::boot();
-
+        //创建用户前添加为activation_token 字段赋值
         static::creating(function ($user) {
             $user->activation_token = Str::random(10);
         });
     }
+
+    public function feed()
+    {
+        return $this->statuses()
+                    ->orderBy('created_at', 'desc');
+    }
+
 }
